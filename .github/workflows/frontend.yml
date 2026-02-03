@@ -10,3 +10,35 @@ on:
       - main
     paths:
       - 'applications/resume-site/src/frontend/**'
+
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # https://github.com/actions/checkout
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      # https://github.com/aws-actions/configure-aws-credentials
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@main
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Sync files to S3
+        if: github.event_name == 'push'
+        run: |
+          aws s3 sync applications/resume-site/src/frontend/ \
+          s3://${{ vars.STATIC_WEBSITE_BUCKET }}/ \
+          --delete
+
+      - name: Invalidate CloudFront cache
+        if: github.event_name == 'push'
+        run: |
+          aws cloudfront create-invalidation \
+          --distribution-id ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }} \
+          --paths "/*"

@@ -10,3 +10,39 @@ on:
       - main
     paths:
       - 'applications/resume-site/src/lambda/**'
+
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # https://github.com/actions/checkout
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      # https://github.com/aws-actions/configure-aws-credentials
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@main
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Zip Lambda function
+        working-directory: applications/resume-site/src/lambda/visitor_counter/
+        run: |
+          zip lambda_function.zip lambda_function.py
+
+      - name: Upload to S3
+        run: |
+          aws s3 cp applications/resume-site/src/lambda/visitor_counter/lambda_function.zip \
+          s3://${{ vars.LAMBDA_ARTIFACTS_BUCKET }}/lambda_function.zip
+
+      - name: Update Lambda function
+        if: github.event_name == 'push'
+        run: |
+          aws lambda update-function-code \
+          --function-name visit-counter-function \
+          --s3-bucket ${{ vars.LAMBDA_ARTIFACTS_BUCKET }} \
+          --s3-key lambda_function.zip

@@ -1,0 +1,3 @@
+[tools]
+terragrunt = "latest"
+terraform = "latest"

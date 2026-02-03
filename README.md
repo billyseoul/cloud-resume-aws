@@ -48,12 +48,7 @@
 
 ### Step 1: Bootstrap SSM Parameters
 ```bash
-# Option A: Using Ansible
-cd ansible
-ansible-galaxy collection install -r requirements.yml
-ansible-playbook playbooks/bootstrap-ssm.yml  # Edit emails in playbook first
-
-# Option B: Manual AWS CLI
+# Manual AWS CLI
 aws ssm put-parameter --name "/org/prod/email" --value "prod@example.com" --type "String"
 aws ssm put-parameter --name "/org/test/email" --value "test@example.com" --type "String"
 

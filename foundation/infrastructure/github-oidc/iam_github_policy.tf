@@ -54,7 +54,10 @@ resource "aws_iam_role_policy" "ssm_parameters" {
           "ssm:GetParameter",
           "ssm:GetParameters"
         ]
-        Resource = "arn:aws:ssm:*:*:parameter/cloud-resume/*"
+        Resource = [
+          "arn:aws:ssm:*:*:parameter/cloud-resume/*",
+          "arn:aws:ssm:*:*:parameter/org/*"
+        ]
       }
     ]
   })
@@ -165,6 +168,30 @@ resource "aws_iam_role_policy" "infrastructure_management" {
   })
 }
 
+###################################################################
+# Allows GitHub Actions to read AWS Organizations information
+###################################################################
+resource "aws_iam_role_policy" "organizations_read" {
+  name = "OrganizationsRead"
+  role = aws_iam_role.github_actions.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "OrganizationsRead"
+        Effect = "Allow"
+        Action = [
+          "organizations:DescribeOrganization",
+          "organizations:ListAccounts",
+          "organizations:ListOrganizationalUnitsForParent"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
 #############################################################################
 # IAM role that GitHub Actions assumes via OIDC
 # Trust policy restricts access to only the specified GitHub repo and branch
@@ -188,7 +215,7 @@ resource "aws_iam_role" "github_actions" {
             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
           }
           StringLike = {
-            "token.actions.githubusercontent.com:sub" = "repo:${var.github_org}/${var.github_repo}:*" # ref:refs/heads/${var.allowed_branch}
+            "token.actions.githubusercontent.com:sub" = "repo:${var.github_org}/${var.github_repo}:*"
           }
         }
       }

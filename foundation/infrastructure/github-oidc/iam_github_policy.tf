@@ -83,7 +83,8 @@ resource "aws_iam_role_policy" "infrastructure_management" {
           "lambda:AddPermission",
           "lambda:RemovePermission",
           "lambda:ListFunctions",
-          "lambda:ListVersionsByFunction"
+          "lambda:ListVersionsByFunction",
+          "lambda:GetFunctionCodeSigningConfig"
         ]
         Resource = "*"
       },
@@ -140,7 +141,8 @@ resource "aws_iam_role_policy" "infrastructure_management" {
           "dynamodb:GetItem",
           "dynamodb:PutItem",
           "dynamodb:UpdateItem",
-          "dynamodb:DescribeContinuousBackups"
+          "dynamodb:DescribeContinuousBackups",
+          "dynamodb:DescribeTimeToLive"
         ]
         Resource = "*"
       },
@@ -170,6 +172,7 @@ resource "aws_iam_role_policy" "infrastructure_management" {
   })
 }
 
+
 ###################################################################
 # Allows GitHub Actions to read AWS Organizations information
 ###################################################################
@@ -187,13 +190,15 @@ resource "aws_iam_role_policy" "organizations_read" {
           "organizations:DescribeOrganization",
           "organizations:ListAccounts",
           "organizations:ListOrganizationalUnitsForParent",
-          "organizations:ListRoots"
+          "organizations:ListRoots",
+          "organizations:ListAWSServiceAccessForOrganization"
         ]
         Resource = "*"
       }
     ]
   })
 }
+
 
 resource "aws_iam_role_policy" "organizations_management" {
   name = "OrganizationsManagement"

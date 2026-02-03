@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billy Campbell - Resume</title>
+    <link rel="stylesheet" href="index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Cutive+Mono&family=Nunito&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        /* Visitor counter styling */
+        .visitor-row {
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: #6b7280; /* same as email line in light mode */
+            font-weight: 400;
+        }
+        .visitor-row i {
+            font-size: 11px;
+            color: inherit; /* follow text color */
+        }
+        .visitor-row span {
+            font-size: 12px;
+            font-weight: 400;
+            color: inherit;
+        }
+
+        /* Adjust for dark mode */
+        body.dark-mode .visitor-row {
+            color: #9ca3af; /* similar to dark-mode email/college color */
+        }
+    </style>
+</head>
+<body>
+    <div id="theme-toggle">
+        <i class="fas fa-moon"></i>
+    </div>
+    <div id="container">
+        <div id="profile">
+            <p id="name">Billy Campbell<br><span id="email">lee.min.seoul@gmail.com</span></p>
+            <p id="designation">Cloud Engineer<br><span id="college">Austin, Texas</span></p>
+            <div id="social-links">
+                <a href="https://www.linkedin.com/in/campbellinux"><i class="fab fa-linkedin-in stroke-transparent"></i></a>
+                <a href="https://github.com/billyseoul"><i class="fab fa-github stroke-transparent"></i></a>
+                <a href="https://www.credly.com/users/billy-campbell.c60f63be/badges"><i class="fas fa-certificate stroke-transparent"></i></a>
+            </div>
+
+            <!-- Visitor Counter (theme-aware, with icon) -->
+            <p class="visitor-row">
+                <i class="fas fa-user"></i>
+                <span>Visitors: <span id="visitor-count">0</span></span>
+            </p>
+
+            <hr width="100%">
+
+            <!-- Security Clearance Section -->
+            <div class="sidebar-section">
+                <p class="sidebar-title"><i class="fas fa-user-shield"></i> Security Clearance</p>
+                <div class="sidebar-tags">
+                    <span class="tag clearance-tag"><i class="fas fa-shield-alt"></i> Active Top Secret Clearance SCI</span>
+                    <span class="tag clearance-tag"><i class="fas fa-fingerprint"></i> CI Polygraph</span>
+                </div>
+            </div>
+
+            <hr width="100%">
+
+            <!-- Certifications Section -->
+            <div class="sidebar-section">
+                <p class="sidebar-title"><i class="fas fa-award"></i> Certifications</p>
+                <div class="sidebar-tags">
+                    <span class="tag"><i class="fab fa-redhat"></i> RHCE - Red Hat Certified Engineer</span>
+                    <span class="tag"><i class="fab fa-redhat"></i> RHCSA - Red Hat Certified Systems Administrator</span>
+                    <span class="tag"><i class="fab fa-aws"></i> AWS Solutions Architect</span>
+                    <span class="tag"><i class="fab fa-microsoft"></i> Azure Fundamentals</span>
+                    <span class="tag"><i class="fas fa-shield-alt"></i> CompTIA Security+</span>
+                    <span class="tag"><i class="fas fa-server"></i> VMware VCP6-DCV</span>
+                    <span class="tag"><i class="fas fa-network-wired"></i> Cisco CCNP</span>
+                </div>
+            </div>
+
+            <hr width="100%">
+
+            <!-- Skills Section -->
+            <div class="sidebar-section">
+                <p class="sidebar-title"><i class="fas fa-code"></i> Skills</p>
+                <div class="sidebar-tags">
+                    <span class="tag"><i class="fas fa-cube"></i> Terraform</span>
+                    <span class="tag"><i class="fas fa-layer-group"></i> Terragrunt</span>
+                    <span class="tag"><i class="fas fa-cogs"></i> Ansible</span>
+                    <span class="tag"><i class="fas fa-dharmachakra"></i> Kubernetes</span>
+                    <span class="tag"><i class="fas fa-chart-bar"></i> Observability</span>
+                    <span class="tag"><i class="fas fa-code-branch"></i> CI/CD</span>
+                    <span class="tag"><i class="fab fa-docker"></i> Docker</span>
+                    <span class="tag"><i class="fab fa-aws"></i> AWS</span>
+                    <span class="tag"><i class="fab fa-microsoft"></i> Azure</span>
+                    <span class="tag"><i class="fas fa-box"></i> Vagrant</span>
+                    <span class="tag"><i class="fas fa-terminal"></i> Bash</span>
+                    <span class="tag"><i class="fab fa-python"></i> Python</span>
+                    <span class="tag"><i class="fas fa-chart-line"></i> Splunk</span>
+                    <span class="tag"><i class="fab fa-linux"></i> Linux</span>
+                    <span class="tag"><i class="fas fa-anchor"></i> Helm</span>
+                    <span class="tag"><i class="fab fa-git-alt"></i> Git</span>
+                    <span class="tag"><i class="fas fa-server"></i> VMware</span>
+                    <span class="tag"><i class="fab fa-redhat"></i> RHEL</span>
+                </div>
+            </div>
+
+            <hr width="100%">
+
+            <!-- Languages Section -->
+            <div class="sidebar-section">
+                <p class="sidebar-title"><i class="fas fa-globe-americas"></i> Languages</p>
+                <div class="sidebar-tags">
+                    <span class="tag"><i class="fas fa-language"></i> English - Native</span>
+                    <span class="tag"><i class="fas fa-language"></i> Korean - Fluent</span>
+                </div>
+            </div>
+
+            <hr width="100%">
+
+        </div>
+        <div id="info-cards">
+            <div class="card">
+                <p><i class="fas fa-briefcase stroke-transparent"></i>&nbsp;&nbsp;&nbsp;Hypori</p>
+                <p class="tags">Cloud Integration Engineer<br><span>Austin, Texas | <span>January 2020 – Present</span></span></p>
+                <ul>
+                    <li>Deployed and provisioned customer cloud infrastructure across AWS GovCloud (IL5/IL6/CMMC-2), commercial AWS, and Azure environments using Terraform.</li>
+                    <li>Manage Kubernetes worker nodes running containerized workloads; troubleshoot pod scheduling, node auto-scaling, networking, and persistent storage issues.</li>
+                    <li>Automated security compliance scanning and remediation using Ansible playbooks, applying DISA STIG profiles and RHEL security patches across 100+ EC2 instances.</li>
+                    <li>Automated AWS Organizations child account provisioning and post-cluster IAM access setup using Terraform and AWS SSO.</li>
+                    <li>Generated Change Management and Authorized Service Interruption tickets to schedule production upgrades or disaster recovery exercises.</li>
+                    <li>Participated in on-call rotation to monitor devices and mitigate production outages for customer BYOD virtual devices.</li>
+                </ul>
+            </div>
+            <div class="card">
+                <p><i class="fas fa-briefcase stroke-transparent"></i>&nbsp;&nbsp;&nbsp;U.S. Bank</p>
+                <p class="tags">Data Center Engineer II<br><span>St. Paul, Minnesota | <span>Nov 2017 – Dec 2019</span></span></p>
+                <ul>
+                    <li>Utilize ITSM ServiceNow ticketing system in monitoring P1 and P2 incidents for US Bank data center infrastructure.</li>
+                    <li>Rack, stack, configure and test network equipment (Cisco, Brocade switches, routers, CheckPoint firewalls, GigaVUE 420).</li>
+                    <li>Provided daily maintenance of HDD and DIMMs replacement for HP and Cisco UCS servers.</li>
+                    <li>Test network connection of Cat6, SC-LC, LC-LC, OM3, and OM5 connectors with Fluke Testing equipment.</li>
+                    <li>Utilize Aperture Vista DCIM and coordinate with the IT Infrastructure Planning team in completing project work orders.</li>
+                </ul>
+            </div>
+            <div class="card">
+                <p><i class="fas fa-briefcase stroke-transparent"></i>&nbsp;&nbsp;&nbsp;Ventech Solutions</p>
+                <p class="tags">System Administrator<br><span>Bloomington, Minnesota | <span>Nov 2016 – Nov 2017</span></span></p>
+                <ul>
+                    <li>Managed Virtual Machines with VMware Horizon 7 Administrator, deploy guest VMs using approved pre-configured Templates.</li>
+                    <li>Conducted IAVA scans and performed system patching using IBM Big Fix, sourcing patches from the DISA patch repository.</li>
+                    <li>Created a PowerShell script for scheduled end-of-week computer restarts, streamlining GPO policy management.</li>
+                    <li>Managed user account operations including creation, deletion, PKI certificates, and password resets within Windows Server 2012 R2 Active Directory.</li>
+                    <li>Manage GFE iPhones for GS employees utilizing MDM AirWatch for software updates and compliance.</li>
+                </ul>
+            </div>
+            <div class="card">
+                <p><i class="fas fa-briefcase stroke-transparent"></i>&nbsp;&nbsp;&nbsp;Vectrus</p>
+                <p class="tags">Network Administrator<br><span>APO, AE | <span>Oct 2015 – Nov 2016</span></span></p>
+                <ul>
+                    <li>Provided Tier 2 Network Security Support for 160th Signal Brigade, under 54th Signal Battalion Network Operations Security Center.</li>
+                    <li>Created DHCP Scope requests and VLAN assignments for U.S. Army units arriving on new deployment missions.</li>
+                    <li>Provided multi-site support and configure Cisco networking protocols such as Port-Security, MAB, Sticky MAC, STP, and 802.1x authentication.</li>
+                    <li>Configured and changed keys on the TACLANE and monitored military NIPR/SIPR/CENTRIX networks using CA Spectrum.</li>
+                </ul>
+            </div>
+            <div class="card">
+                <p><i class="fas fa-briefcase stroke-transparent"></i>&nbsp;&nbsp;&nbsp;SPS, Inc.</p>
+                <p class="tags">Field Service Representative<br><span>APO, AE | <span>Sep 2014 – July 2015</span></span></p>
+                <ul>
+                    <li>Conduct field site surveys of potential system locations for installation and migrations of Windows XP and 7 laptops, printers, and Cisco IOS switches.</li>
+                    <li>Provide quarterly machine refreshes with users by baselining/re-imaging and user profile deletions in a Windows Enterprise environment.</li>
+                    <li>Create metrics reports of vulnerability scans to NOC supervisors and coordinate in moving non-compliant machines to purgatory VLANs.</li>
+                </ul>
+            </div>
+            <div class="card">
+                <p><i class="fas fa-graduation-cap stroke-transparent"></i>&nbsp;&nbsp;&nbsp;Education</p>
+                <ul>
+                    <li>
+                        <p class="tags">Oregon State University<br><span>Post-Baccalaureate in Computer Science | <span>January 2023 – December 2025</span></span></p>
+                    </li>
+                    <li>
+                        <p class="tags">Capella University<br><span>Bachelor of Science in Accounting | <span>Graduated July 2015</span></span></p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dark mode script -->
+    <script>
+        const toggle = document.getElementById('theme-toggle');
+        const icon = toggle.querySelector('i');
+
+        toggle.addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+
+            if (document.body.classList.contains('dark-mode')) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+        });
+    </script>
+
+    <!-- Visitor counter script -->
+    <script>
+        const counterEl = document.getElementById('visitor-count');
+
+        async function updateVisitorCount() {
+            try {
+                const response = await fetch(
+                    'https://cowrylg8a7.execute-api.us-east-1.amazonaws.com/prod/counter'
+                );
+                if (!response.ok) {
+                    console.error('API error', response.status);
+                    return;
+                }
+
+                const data = await response.json();
+                counterEl.textContent = data.count;
+            } catch (err) {
+                console.error('Fetch failed', err);
+            }
+        }
+
+        updateVisitorCount();
+    </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+name: Deploy Lambda Function
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'applications/resume-site/src/lambda/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'applications/resume-site/src/lambda/**'

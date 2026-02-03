@@ -1,0 +1,14 @@
+name: Deploy Application Infrastructure
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'applications/resume-site/infrastructure/**'
+      - 'applications/resume-site/deployments/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'applications/resume-site/infrastructure/**'
+      - 'applications/resume-site/deployments/**'

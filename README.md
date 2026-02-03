@@ -25,8 +25,6 @@
 │       └── tests/               # pytest integration tests
 ├── scripts/
 │   └── update-godaddy-dns.py   # GoDaddy DNS automation
-├── ansible/
-│   └── playbooks/               # SSM parameter bootstrap
 ├── root.hcl                    # Root Terragrunt config
 ├── locals.hcl                  # SSM parameter fetching
 └── Makefile                    # Deployment commands

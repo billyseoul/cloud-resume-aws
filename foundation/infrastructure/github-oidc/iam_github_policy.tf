@@ -82,7 +82,8 @@ resource "aws_iam_role_policy" "infrastructure_management" {
           "lambda:UpdateFunctionConfiguration",
           "lambda:AddPermission",
           "lambda:RemovePermission",
-          "lambda:ListFunctions"
+          "lambda:ListFunctions",
+          "lambda:ListVersionsByFunction"
         ]
         Resource = "*"
       },
@@ -138,7 +139,8 @@ resource "aws_iam_role_policy" "infrastructure_management" {
           "dynamodb:DescribeTable",
           "dynamodb:GetItem",
           "dynamodb:PutItem",
-          "dynamodb:UpdateItem"
+          "dynamodb:UpdateItem",
+          "dynamodb:DescribeContinuousBackups"
         ]
         Resource = "*"
       },
@@ -184,7 +186,30 @@ resource "aws_iam_role_policy" "organizations_read" {
         Action = [
           "organizations:DescribeOrganization",
           "organizations:ListAccounts",
-          "organizations:ListOrganizationalUnitsForParent"
+          "organizations:ListOrganizationalUnitsForParent",
+          "organizations:ListRoots"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "organizations_management" {
+  name = "OrganizationsManagement"
+  role = aws_iam_role.github_actions.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "OrganizationsRead"
+        Effect = "Allow"
+        Action = [
+          "organizations:DescribeOrganization",
+          "organizations:ListAccounts",
+          "organizations:ListOrganizationalUnitsForParent",
+          "organizations:ListRoots"
         ]
         Resource = "*"
       }

@@ -152,6 +152,16 @@ resource "aws_iam_role_policy" "infrastructure_management" {
         Resource = "*"
       },
       {
+        Sid    = "ACMRead"
+        Effect = "Allow"
+        Action = [
+          "acm:DescribeCertificate",
+          "acm:ListCertificates",
+          "acm:GetCertificate"
+        ]
+        Resource = "*"
+      },
+      {
         Sid    = "IAMReadOnly"
         Effect = "Allow"
         Action = [
@@ -196,7 +206,8 @@ resource "aws_iam_role_policy" "organizations_read" {
           "organizations:ListOrganizationalUnitsForParent",
           "organizations:ListRoots",
           "organizations:ListAWSServiceAccessForOrganization",
-          "organizations:DescribeOrganizationalUnit"
+          "organizations:DescribeOrganizationalUnit",
+          "organizations:ListParents"
         ]
         Resource = "*"
       }

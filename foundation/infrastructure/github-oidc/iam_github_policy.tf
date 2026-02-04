@@ -157,7 +157,8 @@ resource "aws_iam_role_policy" "infrastructure_management" {
         Action = [
           "acm:DescribeCertificate",
           "acm:ListCertificates",
-          "acm:GetCertificate"
+          "acm:GetCertificate",
+          "acm:ListTagsForCertificate"
         ]
         Resource = "*"
       },
@@ -207,7 +208,8 @@ resource "aws_iam_role_policy" "organizations_read" {
           "organizations:ListRoots",
           "organizations:ListAWSServiceAccessForOrganization",
           "organizations:DescribeOrganizationalUnit",
-          "organizations:ListParents"
+          "organizations:ListParents",
+          "organizations:ListAccountsForParent"
         ]
         Resource = "*"
       }

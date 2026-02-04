@@ -64,7 +64,7 @@ resource "aws_iam_role_policy" "ssm_parameters" {
 }
 
 ###################################################################
-# Allows GitHub Actions to deploy and manage my AWS infrastructure
+# Allows GitHub Actions to deploy and manage AWS infrastructure
 ###################################################################
 resource "aws_iam_role_policy" "infrastructure_management" {
   name = "InfrastructureManagement"
@@ -115,6 +115,7 @@ resource "aws_iam_role_policy" "infrastructure_management" {
           "s3:GetBucketAcl",
           "s3:GetBucketPolicy",
           "s3:GetBucketPublicAccessBlock",
+          "s3:GetBucketCORS",
           "s3:PutBucketPublicAccessBlock",
           "s3:PutBucketPolicy"
         ]
@@ -155,7 +156,7 @@ resource "aws_iam_role_policy" "infrastructure_management" {
         Resource = "*"
       },
       {
-        Sid    = "ACMRead"
+        Sid    = "ACMManagement"
         Effect = "Allow"
         Action = [
           "acm:DescribeCertificate",
@@ -192,34 +193,8 @@ resource "aws_iam_role_policy" "infrastructure_management" {
 }
 
 ###################################################################
-# Allows GitHub Actions to read AWS Organizations information
+# Allows GitHub Actions to read and manage AWS Organizations
 ###################################################################
-resource "aws_iam_role_policy" "organizations_read" {
-  name = "OrganizationsRead"
-  role = aws_iam_role.github_actions.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid    = "OrganizationsRead"
-        Effect = "Allow"
-        Action = [
-          "organizations:DescribeOrganization",
-          "organizations:ListAccounts",
-          "organizations:ListOrganizationalUnitsForParent",
-          "organizations:ListRoots",
-          "organizations:ListAWSServiceAccessForOrganization",
-          "organizations:DescribeOrganizationalUnit",
-          "organizations:ListParents",
-          "organizations:ListAccountsForParent"
-        ]
-        Resource = "*"
-      }
-    ]
-  })
-}
-
 resource "aws_iam_role_policy" "organizations_management" {
   name = "OrganizationsManagement"
   role = aws_iam_role.github_actions.id
@@ -228,13 +203,10 @@ resource "aws_iam_role_policy" "organizations_management" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid    = "OrganizationsRead"
+        Sid    = "OrganizationsFullAccess"
         Effect = "Allow"
         Action = [
-          "organizations:DescribeOrganization",
-          "organizations:ListAccounts",
-          "organizations:ListOrganizationalUnitsForParent",
-          "organizations:ListRoots"
+          "organizations:*"
         ]
         Resource = "*"
       }
@@ -244,12 +216,12 @@ resource "aws_iam_role_policy" "organizations_management" {
 
 #############################################################################
 # IAM role that GitHub Actions assumes via OIDC
-# Trust policy restricts access to only the specified GitHub repo and branch
+# Trust policy restricts access to only the specified GitHub repo
 #############################################################################
 resource "aws_iam_role" "github_actions" {
   name                 = "GitHubActionsRole-${var.github_repo}"
   description          = "Role for GitHub Actions to deploy cloud-resume-aws"
-  max_session_duration = 3600 # 1 hour minimum
+  max_session_duration = 3600
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"

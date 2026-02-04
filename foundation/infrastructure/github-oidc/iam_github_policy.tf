@@ -54,14 +54,17 @@ resource "aws_iam_role_policy" "ssm_parameters" {
           "ssm:GetParameter",
           "ssm:GetParameters"
         ]
-        Resource = "arn:aws:ssm:*:*:parameter/cloud-resume/*"
+        Resource = [
+          "arn:aws:ssm:*:*:parameter/cloud-resume/*",
+          "arn:aws:ssm:*:*:parameter/org/*"
+        ]
       }
     ]
   })
 }
 
 ###################################################################
-# Allows GitHub Actions to deploy and manage my AWS infrastructure
+# Allows GitHub Actions to deploy and manage AWS infrastructure
 ###################################################################
 resource "aws_iam_role_policy" "infrastructure_management" {
   name = "InfrastructureManagement"
@@ -75,11 +78,15 @@ resource "aws_iam_role_policy" "infrastructure_management" {
         Effect = "Allow"
         Action = [
           "lambda:GetFunction",
+          "lambda:GetFunctionConfiguration",
+          "lambda:GetFunctionCodeSigningConfig",
+          "lambda:GetPolicy",
+          "lambda:ListFunctions",
+          "lambda:ListVersionsByFunction",
           "lambda:UpdateFunctionCode",
           "lambda:UpdateFunctionConfiguration",
           "lambda:AddPermission",
-          "lambda:RemovePermission",
-          "lambda:ListFunctions"
+          "lambda:RemovePermission"
         ]
         Resource = "*"
       },
@@ -99,15 +106,7 @@ resource "aws_iam_role_policy" "infrastructure_management" {
         Sid    = "S3Management"
         Effect = "Allow"
         Action = [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:DeleteObject",
-          "s3:ListBucket",
-          "s3:GetBucketLocation",
-          "s3:GetBucketVersioning",
-          "s3:PutBucketPublicAccessBlock",
-          "s3:PutBucketPolicy",
-          "s3:GetBucketPolicy"
+          "s3:*"
         ]
         Resource = [
           "arn:aws:s3:::static-website-*",
@@ -120,11 +119,7 @@ resource "aws_iam_role_policy" "infrastructure_management" {
         Sid    = "CloudFrontManagement"
         Effect = "Allow"
         Action = [
-          "cloudfront:GetDistribution",
-          "cloudfront:UpdateDistribution",
-          "cloudfront:CreateInvalidation",
-          "cloudfront:GetInvalidation",
-          "cloudfront:ListDistributions"
+          "cloudfront:*"
         ]
         Resource = "*"
       },
@@ -133,9 +128,25 @@ resource "aws_iam_role_policy" "infrastructure_management" {
         Effect = "Allow"
         Action = [
           "dynamodb:DescribeTable",
+          "dynamodb:ListTables",
           "dynamodb:GetItem",
           "dynamodb:PutItem",
-          "dynamodb:UpdateItem"
+          "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem",
+          "dynamodb:DescribeContinuousBackups",
+          "dynamodb:DescribeTimeToLive",
+          "dynamodb:ListTagsOfResource"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "ACMManagement"
+        Effect = "Allow"
+        Action = [
+          "acm:DescribeCertificate",
+          "acm:ListCertificates",
+          "acm:GetCertificate",
+          "acm:ListTagsForCertificate"
         ]
         Resource = "*"
       },
@@ -165,14 +176,36 @@ resource "aws_iam_role_policy" "infrastructure_management" {
   })
 }
 
+###################################################################
+# Allows GitHub Actions to read and manage AWS Organizations
+###################################################################
+resource "aws_iam_role_policy" "organizations_management" {
+  name = "OrganizationsManagement"
+  role = aws_iam_role.github_actions.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "OrganizationsFullAccess"
+        Effect = "Allow"
+        Action = [
+          "organizations:*"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
 #############################################################################
 # IAM role that GitHub Actions assumes via OIDC
-# Trust policy restricts access to only the specified GitHub repo and branch
+# Trust policy restricts access to only the specified GitHub repo
 #############################################################################
 resource "aws_iam_role" "github_actions" {
   name                 = "GitHubActionsRole-${var.github_repo}"
   description          = "Role for GitHub Actions to deploy cloud-resume-aws"
-  max_session_duration = 3600 # 1 hour minimum
+  max_session_duration = 3600
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -188,7 +221,7 @@ resource "aws_iam_role" "github_actions" {
             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
           }
           StringLike = {
-            "token.actions.githubusercontent.com:sub" = "repo:${var.github_org}/${var.github_repo}:ref:refs/heads/${var.allowed_branch}"
+            "token.actions.githubusercontent.com:sub" = "repo:${var.github_org}/${var.github_repo}:*"
           }
         }
       }

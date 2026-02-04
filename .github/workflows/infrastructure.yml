@@ -1,0 +1,62 @@
+name: Deploy Application Infrastructure
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'applications/resume-site/infrastructure/**'
+      - 'applications/resume-site/deployments/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'applications/resume-site/infrastructure/**'
+      - 'applications/resume-site/deployments/**'
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # https://github.com/actions/checkout
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      # https://github.com/gruntwork-io/terragrunt-action
+      - name: Setup Terragrunt
+        uses: gruntwork-io/terragrunt-action@v3
+
+      # https://github.com/aws-actions/configure-aws-credentials
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@main
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Run terragrunt plan - Backend
+        working-directory: applications/resume-site/deployments/backend
+        run: terragrunt plan
+
+      - name: Run terragrunt plan - DNS
+        working-directory: applications/resume-site/deployments/dns
+        run: terragrunt plan
+
+      - name: Run terragrunt plan - Frontend
+        working-directory: applications/resume-site/deployments/frontend
+        run: terragrunt plan
+
+      - name: Run terragrunt apply - Backend
+        if: github.event_name == 'push'
+        working-directory: applications/resume-site/deployments/backend
+        run: terragrunt apply --auto-approve
+
+      - name: Run terragrunt apply - DNS
+        if: github.event_name == 'push'
+        working-directory: applications/resume-site/deployments/dns
+        run: terragrunt apply --auto-approve
+
+      - name: Run terragrunt apply - Frontend
+        if: github.event_name == 'push'
+        working-directory: applications/resume-site/deployments/frontend
+        run: terragrunt apply --auto-approve

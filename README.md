@@ -178,7 +178,7 @@ make clean            # Remove cache files
 
 ## Tech Stack
 
-**Infrastructure:** Terraform, Terragrunt, Ansible, Python
+**Infrastructure:** Terraform, Terragrunt, Python
 **Cloud:** AWS Lambda, API Gateway, DynamoDB, S3, CloudFront, Organizations
 **CI/CD:** GitHub Actions, GitHub OIDC
 **Testing:** pytest, requests, boto3
@@ -189,4 +189,4 @@ make clean            # Remove cache files
 ## Author
 
 **Billy Campbell** – Cloud Engineer
-Website: [thefullstacker.com](https://thefullstacker.com)
+Website: [thefullstacker.com]

@@ -79,14 +79,14 @@ resource "aws_iam_role_policy" "infrastructure_management" {
         Action = [
           "lambda:GetFunction",
           "lambda:GetFunctionConfiguration",
+          "lambda:GetFunctionCodeSigningConfig",
+          "lambda:GetPolicy",
+          "lambda:ListFunctions",
+          "lambda:ListVersionsByFunction",
           "lambda:UpdateFunctionCode",
           "lambda:UpdateFunctionConfiguration",
           "lambda:AddPermission",
-          "lambda:RemovePermission",
-          "lambda:ListFunctions",
-          "lambda:ListVersionsByFunction",
-          "lambda:GetFunctionCodeSigningConfig",
-          "lambda:GetPolicy"
+          "lambda:RemovePermission"
         ]
         Resource = "*"
       },
@@ -112,9 +112,11 @@ resource "aws_iam_role_policy" "infrastructure_management" {
           "s3:ListBucket",
           "s3:GetBucketLocation",
           "s3:GetBucketVersioning",
+          "s3:GetBucketAcl",
+          "s3:GetBucketPolicy",
+          "s3:GetBucketPublicAccessBlock",
           "s3:PutBucketPublicAccessBlock",
-          "s3:PutBucketPolicy",
-          "s3:GetBucketPolicy"
+          "s3:PutBucketPolicy"
         ]
         Resource = [
           "arn:aws:s3:::static-website-*",
@@ -128,6 +130,7 @@ resource "aws_iam_role_policy" "infrastructure_management" {
         Effect = "Allow"
         Action = [
           "cloudfront:GetDistribution",
+          "cloudfront:GetOriginAccessControl",
           "cloudfront:UpdateDistribution",
           "cloudfront:CreateInvalidation",
           "cloudfront:GetInvalidation",

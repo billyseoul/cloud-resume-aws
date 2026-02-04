@@ -106,18 +106,7 @@ resource "aws_iam_role_policy" "infrastructure_management" {
         Sid    = "S3Management"
         Effect = "Allow"
         Action = [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:DeleteObject",
-          "s3:ListBucket",
-          "s3:GetBucketLocation",
-          "s3:GetBucketVersioning",
-          "s3:GetBucketAcl",
-          "s3:GetBucketPolicy",
-          "s3:GetBucketPublicAccessBlock",
-          "s3:GetBucketCORS",
-          "s3:PutBucketPublicAccessBlock",
-          "s3:PutBucketPolicy"
+          "s3:*"
         ]
         Resource = [
           "arn:aws:s3:::static-website-*",

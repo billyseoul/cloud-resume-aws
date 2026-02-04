@@ -119,12 +119,7 @@ resource "aws_iam_role_policy" "infrastructure_management" {
         Sid    = "CloudFrontManagement"
         Effect = "Allow"
         Action = [
-          "cloudfront:GetDistribution",
-          "cloudfront:GetOriginAccessControl",
-          "cloudfront:UpdateDistribution",
-          "cloudfront:CreateInvalidation",
-          "cloudfront:GetInvalidation",
-          "cloudfront:ListDistributions"
+          "cloudfront:*"
         ]
         Resource = "*"
       },

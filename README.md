@@ -288,6 +288,9 @@ make clean                # Remove cache files
 └─────────────────────────────────────────────────────────────────┘
 ```
 
+<img width="2215" height="1579" alt="cloud-resume-architecture-horizontal" src="https://github.com/user-attachments/assets/b28e6c40-b193-42fb-bf4a-7823126d8758" />
+
+
 ---
 
 ## Security Features

@@ -36,6 +36,21 @@ resource "aws_iam_role_policy" "dynamodb_access" {
   })
 }
 
+# SNS publish permissions
+resource "aws_iam_role_policy" "sns_publish" {
+  name = "visitor-counter-sns-publish"
+  role = aws_iam_role.visit_count.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Action = "sns:Publish"
+      Resource = var.sns_topic_arn
+    }]
+  })
+}
+
 # CloudWatch Logs permissions for Lambda
 resource "aws_iam_role_policy_attachment" "lambda_logs" {
   role       = aws_iam_role.visit_count.name

@@ -54,4 +54,12 @@ locals {
     "--query", "Parameter.Value",
     "--output", "text"
   )
+
+  email = run_cmd(
+    "--terragrunt-quiet",
+    "aws", "ssm", "get-parameter",
+    "--name", "/cloud-resume/email",
+    "--query", "Parameter.Value",
+    "--output", "text"
+  )
 }

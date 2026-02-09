@@ -9,5 +9,12 @@ resource "aws_lambda_function" "visitor_function" {
 
   s3_bucket = var.lambda_s3_bucket
   s3_key    = var.lambda_s3_key
+
+  environment {
+  variables = {
+    SNS_TOPIC_ARN = var.sns_topic_arn
+    VISITOR_THRESHOLD   = var.visitor_threshold
+  }
+}
 }
 

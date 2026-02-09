@@ -34,6 +34,15 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ vars.AWS_REGION }}
 
+      - name: Run terragrunt plan - Monitoring
+        working-directory: applications/resume-site/deployments/monitoring
+        run: terragrunt plan
+
+      - name: Run terragrunt apply - Monitoring
+        if: github.event_name == 'push'
+        working-directory: applications/resume-site/deployments/monitoring
+        run: terragrunt apply --auto-approve
+
       - name: Run terragrunt plan - Backend
         working-directory: applications/resume-site/deployments/backend
         run: terragrunt plan

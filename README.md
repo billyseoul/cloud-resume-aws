@@ -67,6 +67,9 @@ website: https://thefullstacker.com
 aws ssm put-parameter --name "/org/prod/email" --value "prod@example.com" --type "String"
 aws ssm put-parameter --name "/org/test/email" --value "test@example.com" --type "String"
 
+# Monitoring alert email
+aws ssm put-parameter --name "/cloud-resume/email" --value "alerts@example.com" --type "String"
+
 # Create Lambda artifacts bucket and upload function
 export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 aws s3 mb s3://lambda-artifacts-${AWS_ACCOUNT_ID}
@@ -90,21 +93,54 @@ make deploy-org
 # 2. Deploy GitHub OIDC (for CI/CD)
 make deploy-foundation
 
-# 3. Deploy backend
+# 3. Deploy monitoring (SNS topic for alerts)
+make deploy-monitoring
+
+# 4. Deploy backend
 make deploy-backend
 
 # Store API URL in SSM
 API_URL=$(cd applications/resume-site/deployments/backend && terragrunt output -raw api_gateway_url)
 aws ssm put-parameter --name "/cloud-resume/api_gateway_url" --value "${API_URL}" --type "String" --overwrite
 
-# 4. Deploy frontend
+# 5. Deploy frontend
 make deploy-frontend
 
-# 5. Run integration tests
+# 6. Deploy observability (Grafana IAM user)
+make deploy-observability
+
+# 7. Run integration tests
 make test
 ```
 
 **Or deploy everything:** `make deploy-all`
+
+---
+
+## Monitoring & Observability Setup
+
+### SNS Email Alerts
+The monitoring module creates an SNS topic that sends email notifications when CloudWatch alarms are triggered (e.g., high Lambda error rates or API Gateway 5xx errors).
+
+**Confirm email subscription:**
+After deploying monitoring, check your email for an AWS SNS confirmation message and click the confirmation link.
+
+### Grafana Cloud Integration
+The observability module creates an IAM user with CloudWatch read-only access for Grafana Cloud integration.
+
+**Setup Grafana:**
+```bash
+# Get Grafana credentials
+cd applications/resume-site/deployments/observability
+export GRAFANA_ACCESS_KEY=$(terragrunt output -raw grafana_access_key_id)
+export GRAFANA_SECRET_KEY=$(terragrunt output -raw grafana_secret_access_key)
+
+# Add to Grafana Cloud:
+# 1. Log into Grafana Cloud
+# 2. Add AWS CloudWatch data source
+# 3. Use the credentials above
+# 4. Set default region to us-east-1
+```
 
 ---
 
@@ -135,14 +171,16 @@ pytest applications/resume-site/tests/ -v
 
 ## Makefile Commands
 ```bash
-make fmt              # Format Terraform code
-make deploy-org       # Deploy AWS Organizations
-make deploy-foundation # Deploy GitHub OIDC
-make deploy-backend   # Deploy backend
-make deploy-frontend  # Deploy frontend
-make deploy-all       # Deploy everything in order
-make test             # Run pytest tests
-make clean            # Remove cache files
+make fmt                  # Format Terraform code
+make deploy-org           # Deploy AWS Organizations
+make deploy-foundation    # Deploy GitHub OIDC
+make deploy-monitoring    # Deploy SNS monitoring
+make deploy-backend       # Deploy backend
+make deploy-frontend      # Deploy frontend
+make deploy-observability # Deploy Grafana IAM
+make deploy-all           # Deploy everything in order
+make test                 # Run pytest tests
+make clean                # Remove cache files
 ```
 
 ---
@@ -150,29 +188,105 @@ make clean            # Remove cache files
 ## Architecture
 
 ### Layer 1: AWS Organizations
-- Management Account
-- Production OU + Account
-- Test OU + Account
+- **Management Account** - Root account with billing and organizational controls
+- **Production OU + Account** - Isolated production environment
+- **Test OU + Account** - Isolated testing/development environment
 
-### Layer 2: Foundation
-- GitHub OIDC Identity Provider
-- IAM Role for GitHub Actions
-- Terraform state management (auto-created by Terragrunt)
+### Layer 2: Foundation Infrastructure
+- **GitHub OIDC Identity Provider** - Passwordless authentication for GitHub Actions
+- **IAM Role for GitHub Actions** - Scoped permissions for CI/CD deployments
+- **Terraform State Management** - S3 backend with DynamoDB locking (auto-created by Terragrunt)
 
-### Layer 3: Backend
-- Lambda function (Python 3.14)
-- API Gateway REST API
-- DynamoDB table (visitor counter)
-- IAM policies
+### Layer 3: Application Backend
+- **Lambda Function** - Python 3.14 runtime for visitor counter logic
+- **API Gateway REST API** - HTTP endpoint for frontend integration
+- **DynamoDB Table** - Persistent visitor counter storage with on-demand billing
+- **IAM Policies** - Least-privilege access for Lambda execution
 
-### Layer 4: Frontend
-- S3 bucket (static website)
-- CloudFront distribution
-- Origin Access Control (OAC)
+### Layer 4: Application Frontend
+- **S3 Bucket** - Static website hosting (private bucket)
+- **CloudFront Distribution** - Global CDN with HTTPS, caching, and compression
+- **Origin Access Control (OAC)** - Secure S3 access (replaces legacy OAI)
 
-### Layer 5: DNS (Optional)
-- ACM certificate
-- GoDaddy CNAME records → CloudFront
+### Layer 5: DNS & TLS
+- **ACM Certificate** - Free SSL/TLS certificate with DNS validation
+- **GoDaddy DNS** - CNAME records pointing to CloudFront distribution
+- **Custom Domain Support** - Optional domain configuration via variables
+
+### Layer 6: Monitoring & Observability
+- **SNS Topic** - Email notifications for CloudWatch alarms
+- **CloudWatch Alarms** - Monitor Lambda errors, API Gateway latency, DynamoDB throttles
+- **Grafana Cloud** - IAM user with read-only CloudWatch access for metrics dashboards
+- **Lambda Integration** - Visitor counter function sends SNS alerts when threshold exceeded
+
+---
+
+## Architecture Diagram
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    AWS Organizations                            │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐         │
+│  │  Management  │  │ Production   │  │     Test     │         │
+│  │   Account    │  │   Account    │  │   Account    │         │
+│  └──────────────┘  └──────────────┘  └──────────────┘         │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                   Foundation Layer                              │
+│  ┌──────────────────────┐  ┌──────────────────────┐            │
+│  │  GitHub OIDC Provider│  │  Terraform State     │            │
+│  │  + IAM Roles         │  │  S3 + DynamoDB       │            │
+│  └──────────────────────┘  └──────────────────────┘            │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+            ┌─────────────────┴─────────────────┐
+            ▼                                   ▼
+┌───────────────────────────┐     ┌───────────────────────────┐
+│   Backend (API Layer)     │     │   Frontend (Static Site)  │
+│                           │     │                           │
+│  ┌─────────────────────┐ │     │  ┌─────────────────────┐  │
+│  │  API Gateway        │ │     │  │  S3 Bucket          │  │
+│  │  (REST API)         │ │     │  │  (Private)          │  │
+│  └──────────┬──────────┘ │     │  └──────────┬──────────┘  │
+│             │             │     │             │             │
+│  ┌──────────▼──────────┐ │     │  ┌──────────▼──────────┐  │
+│  │  Lambda Function    │ │     │  │  CloudFront         │  │
+│  │  (Python 3.14)      │─┼─────┼─▶│  (Global CDN + OAC) │  │
+│  └──────────┬──────────┘ │     │  └──────────┬──────────┘  │
+│             │             │     │             │             │
+│  ┌──────────▼──────────┐ │     │  ┌──────────▼──────────┐  │
+│  │  DynamoDB Table     │ │     │  │  ACM Certificate    │  │
+│  │  (Visitor Counter)  │ │     │  │  (SSL/TLS)          │  │
+│  └─────────────────────┘ │     │  └─────────────────────┘  │
+└───────────────────────────┘     └───────────────────────────┘
+            │                                   │
+            └─────────────────┬─────────────────┘
+                              ▼
+                    ┌─────────────────────┐
+                    │  GoDaddy DNS        │
+                    │  (CNAME → CF)       │
+                    └─────────────────────┘
+                              │
+                              ▼
+                    ┌─────────────────────┐
+                    │  End User Browser   │
+                    └─────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│              Monitoring & Observability                         │
+│  ┌──────────────────────┐  ┌──────────────────────┐            │
+│  │  CloudWatch Metrics  │  │  SNS Email Alerts    │            │
+│  │  + Alarms            │─▶│  (Threshold-based)   │            │
+│  └──────────────────────┘  └──────────────────────┘            │
+│  ┌──────────────────────┐                                      │
+│  │  Grafana Cloud       │                                      │
+│  │  (Metrics Dashboard) │◀─── IAM User (Read-Only)            │
+│  └──────────────────────┘                                      │
+└─────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
@@ -183,26 +297,36 @@ make clean            # Remove cache files
 - **Least privilege IAM** - Service-scoped permissions
 - **CloudFront OAC** - S3 bucket not publicly accessible
 - **SSM Parameter Store** - Encrypted configuration storage
+- **Private S3 Bucket** - No public access; CloudFront OAC enforces origin restrictions
+- **HTTPS Enforcement** - CloudFront redirects HTTP to HTTPS
+- **DynamoDB Encryption** - Server-side encryption at rest (AWS managed keys)
+- **Grafana Read-Only Access** - IAM user limited to CloudWatch metrics only
 
 ---
 
 ## Cost Estimate
 
 **~$1-5/month** (mostly within AWS Free Tier)
+- AWS Organizations: Free
+- CloudWatch metrics & alarms: ~$0.10/alarm (first 10 free)
+- SNS notifications: $0.50/month (first 1000 free)
+- Grafana Cloud: Free tier available
+- Lambda/API Gateway/DynamoDB/S3/CloudFront: Free tier eligible
 
 ---
 
 ## Tech Stack
 
 **Infrastructure:** Terraform, Terragrunt, Python
-**Cloud:** AWS Lambda, API Gateway, DynamoDB, S3, CloudFront, Organizations
+**Cloud:** AWS Lambda, API Gateway, DynamoDB, S3, CloudFront, Organizations, SNS, CloudWatch
 **CI/CD:** GitHub Actions, GitHub OIDC
 **Testing:** pytest, requests, boto3
 **DNS:** GoDaddy API
+**Monitoring:** AWS CloudWatch, Grafana Cloud
 
 ---
 
 ## Author
 
-**Billy Campbell** – Cloud Engineer
-Website: [thefullstacker.com]
+**Billy Campbell** – Cloud Engineer  
+Website: [thefullstacker.com](https://thefullstacker.com)

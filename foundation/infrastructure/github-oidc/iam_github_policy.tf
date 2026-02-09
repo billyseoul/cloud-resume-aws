@@ -171,6 +171,14 @@ resource "aws_iam_role_policy" "infrastructure_management" {
             "iam:PassedToService" = "lambda.amazonaws.com"
           }
         }
+      },
+      {
+        Sid    = "SNSManagement"
+        Effect = "Allow"
+        Action = [
+          "sns:*"
+        ]
+        Resource = "*"
       }
     ]
   })

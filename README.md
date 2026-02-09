@@ -18,17 +18,33 @@ website: https://thefullstacker.com
 │       ├── infrastructure/
 │       │   ├── backend/         # Lambda + API Gateway + DynamoDB
 │       │   ├── frontend/        # S3 + CloudFront
-│       │   └── dns/             # ACM certificate (optional)
+│       │   ├── dns/             # ACM certificate + Route53
+│       │   ├── monitoring/      # SNS topics for alerts
+│       │   └── observability/   # Grafana IAM setup
 │       ├── deployments/
 │       │   ├── backend/
 │       │   ├── frontend/
-│       │   └── dns/
+│       │   ├── dns/
+│       │   ├── monitoring/
+│       │   └── observability/
+│       ├── src/
+│       │   ├── frontend/        # HTML/CSS/JS files
+│       │   └── lambda/          # Lambda function code
+│       │       └── visitor_counter/
 │       └── tests/               # pytest integration tests
 ├── scripts/
-│   └── update-godaddy-dns.py   # GoDaddy DNS automation
-├── root.hcl                    # Root Terragrunt config
-├── locals.hcl                  # SSM parameter fetching
-└── Makefile                    # Deployment commands
+│   └── update_godaddy_dns.py    # GoDaddy DNS automation
+├── .github/
+│   └── workflows/
+│       ├── foundation.yml       # Deploy foundation infrastructure
+│       ├── infrastructure.yml   # Deploy application infrastructure
+│       ├── frontend.yml         # Deploy frontend assets
+│       └── lambda.yml           # Deploy Lambda functions
+├── root.hcl                     # Root Terragrunt config
+├── locals.hcl                   # SSM parameter fetching
+├── Makefile                     # Deployment commands
+├── requirements.txt             # Python dependencies
+└── mise.toml                    # Development environment config
 ```
 
 ---
